@@ -4,8 +4,70 @@
     <meta charset="utf-8" />
     <title>440 Project</title>
     <link href="./_css/styles.css" rel="stylesheet" type="text/css" />
+      <!--SCRIPTS-->
+     
   </head>
+ 
   <body>
-    <h1>Comp 440 Project</h1>
+    <header>
+      <div class="content-wrap">
+        <button type="button" id="logInBtn" style="height: 45px;">Log in</button>
+        <button type="button" id="signInBtn" style="height: 45px;">Sign Up</button>
+      </div>
+    </header>
+    <main>
+     
+      <section>
+        <div class="content-wrap">
+          <!--signup ui-->
+          <div id="signInModal" class="sn_modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+              <label for="username">User Name:</label>
+              <input type="text" id="username" name="username"><br><br>
+              <label for="password">Password (must match):</label>
+              <input type="text" id="password" name="password"><br><br>
+              <label for="password">Confirm Password:</label>
+              <input type="text" id="password" name="password"><br><br>
+              <button type="button"style="height: 45px;">Sign Up</button>
+            </div>
+          </div>
+          
+          <!--login ui-->
+          <div id="logInModal" class="li_modal">
+            <div class="modal-content">
+              <label for="username">User Name:</label>
+              <input type="text" id="username" name="username"><br><br>
+              <label for="password">Password:</label>
+              <input type="text" id="password" name="password"><br><br>
+              <button type="button"style="height: 45px;">Sign Up</button>
+            </div>
+          </div>
+          
+      </section>
+       <!--script for button to show other UI-->
+      <script>
+      // Get the modal
+        var s_modal = document.getElementById("signInModal");
+        var l_modal = document.getElementById("logInModal");
+        // Get the button that opens the modal
+        var s_btn = document.getElementById("signInBtn");
+        var l_btn = document.getElementById("logInBtn");
+        s_btn.onclick = function() {
+          s_modal.style.display = "block";
+        }
+        l_btn.onclick = function() {
+          l_modal.style.display = "block";
+        }
+        window.onclick = function(event) {
+          if (event.target == s_modal) {
+            s_modal.style.display = "none";
+          }
+          if (event.target == l_modal) {
+            l_modal.style.display = "none";
+          }
+        }
+    </script>
+    </main>
   </body>
 </html>
