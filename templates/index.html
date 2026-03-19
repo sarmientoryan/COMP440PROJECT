@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>440 Project</title>
-    <link href="./_css/styles.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
       <!--SCRIPTS-->
      
   </head>
@@ -20,29 +20,55 @@
       <section>
         <div class="content-wrap">
           <!--signup ui-->
-          <div id="signInModal" class="sn_modal">
-            <!-- Modal content -->
-            <div class="modal-content">
-              <label for="username">User Name:</label>
-              <input type="text" id="username" name="username"><br><br>
-              <label for="password">Password (must match):</label>
-              <input type="text" id="password" name="password"><br><br>
-              <label for="password">Confirm Password:</label>
-              <input type="text" id="password" name="password"><br><br>
-              <button type="button"style="height: 45px;">Sign Up</button>
-            </div>
-          </div>
+          <!--signup ui-->
+<div id="signInModal" class="sn_modal">
+  <div class="modal-content">
+    <form action="/signup" method="POST">
+      
+      <label>Username:</label>
+      <input type="text" name="username" required><br><br>
+
+      <label>Password:</label>
+      <input type="password" name="password" required><br><br>
+
+      <label>Confirm Password:</label>
+      <input type="password" name="confirm" required><br><br>
+
+      <label>First Name:</label>
+      <input type="text" name="firstName"><br><br>
+
+      <label>Last Name:</label>
+      <input type="text" name="lastName"><br><br>
+
+      <label>Email:</label>
+      <input type="email" name="email" required><br><br>
+
+      <label>Phone:</label>
+      <input type="text" name="phone" required><br><br>
+
+      <button type="submit" style="height:45px;">Sign Up</button>
+
+    </form>
+  </div>
+</div>
           
           <!--login ui-->
-          <div id="logInModal" class="li_modal">
-            <div class="modal-content">
-              <label for="username">User Name:</label>
-              <input type="text" id="username" name="username"><br><br>
-              <label for="password">Password:</label>
-              <input type="text" id="password" name="password"><br><br>
-              <button type="button"style="height: 45px;">Sign Up</button>
-            </div>
-          </div>
+          <!--login ui-->
+<div id="logInModal" class="li_modal">
+  <div class="modal-content">
+    <form action="/login" method="POST">
+
+      <label>Username:</label>
+      <input type="text" name="username" required><br><br>
+
+      <label>Password:</label>
+      <input type="password" name="password" required><br><br>
+
+      <button type="submit" style="height:45px;">Log In</button>
+
+    </form>
+  </div>
+</div>
           
       </section>
        <!--script for button to show other UI-->
