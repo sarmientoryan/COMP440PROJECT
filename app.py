@@ -1,14 +1,15 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session
 import mysql.connector
 import bcrypt
 
 
 app = Flask(__name__)
+app.secret_key = "cool_key"
 
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="YOUR_PASSWORD",
+    password="Woodwindow8@",
     database="project_db"
 )
 
@@ -29,7 +30,7 @@ def signup():
     last = data['lastName']
 
     if password != confirm:
-        return "Passwords do not match"
+        return render_template('index.html', msg="Passwords do not match")
 
     cursor = db.cursor()
 
@@ -39,7 +40,7 @@ def signup():
     )
 
     if cursor.fetchone():
-        return "Duplicate username/email/phone"
+        return render_template('index.html', msg="Duplicate username/email/phone")
 
     hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
@@ -49,8 +50,7 @@ def signup():
     """, (username, hashed, first, last, email, phone))
 
     db.commit()
-
-    return "Signup successful"
+    return render_template('index.html', msg="Signup Successful")
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -62,14 +62,23 @@ def login():
     result = cursor.fetchone()
 
     if result and bcrypt.checkpw(password.encode(), result[0].encode()):
-        return "Login successful"
+        session["username"] = username
+        return render_template('loggedin.html')
     else:
-        return "Invalid credentials"
+        return render_template('index.html', inv_msg="Invalid credentials")
     
 cursor = db.cursor()
 cursor.execute("SHOW TABLES")
 for table in cursor:
     print(table)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return render_template('index.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+   

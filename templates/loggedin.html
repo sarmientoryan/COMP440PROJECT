@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>440 Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+     
+  </head>
+ 
+  <body>
+    <header>
+      <div class="content-wrap" style="justify-content: center;">
+        <div style="position: absolute;
+            top:0;
+            right: 0;
+            padding: 25px;
+            background-color: white;" 
+            id="user"
+            ></div>
+        <form action="/logout">
+        <button type="submit" style="height: 45px;">Log Out</button>
+        </form>
+      </div>
+    </header>
+    <main>
+      
+    </main>
+     <script type="text/javascript">
+        var username = "{{ session['username'] }}";
+        document.getElementById("user").innerText = "Logged in as " + username;
+    </script>
+  </body>
+</html>
