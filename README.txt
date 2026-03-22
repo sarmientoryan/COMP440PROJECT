@@ -20,3 +20,5 @@ says password="YOUR_MYSQL_PASSWORD"
 
 you can then run 
 python app.py
+
+youtube demo: https://youtu.be/8n97zosbfps
