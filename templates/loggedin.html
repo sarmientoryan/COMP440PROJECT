@@ -4,30 +4,169 @@
     <meta charset="utf-8" />
     <title>440 Project</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-     
   </head>
- 
+
   <body>
     <header>
-      <div class="content-wrap" style="justify-content: center;">
+      <div class="content-wrap">
+
         <div style="position: absolute;
-            top:0;
-            right: 0;
-            padding: 25px;
-            background-color: white;" 
-            id="user"
-            ></div>
-        <form action="/logout">
-        <button type="submit" style="height: 45px;">Log Out</button>
+                    top: 0;
+                    right: 0;
+                    padding: 25px;
+                    background-color: white;"
+             id="user"></div>
+
+        <form action="/logout" style="display:inline;">
+          <button type="submit" style="height: 45px;">Log Out</button>
         </form>
+
+        <button type="button" id="postRentalBtn" style="height: 45px;">Post Rental</button>
+        <p class="caption">{{ rental_msg }}</p>
+        <p class="caption">{{ review_msg }}</p>
+
       </div>
     </header>
+
     <main>
-      
+      <div class="content-wrap">
+
+        <!-- Search by feature -->
+        <form action="/search" method="GET" style="margin-top: 10px;">
+          <label>Search by Feature:</label>
+          <input type="text" name="feature"
+                 value="{{ searched_feature or '' }}"
+                 placeholder="e.g. Wi-Fi"
+                 style="margin: 0 8px;">
+          <button type="submit" style="height: 35px; width: auto; padding: 0 15px;">Search</button>
+        </form>
+
+        <!-- Search results -->
+        {% if results %}
+        <table style="width: 100%;
+                      margin-top: 20px;
+                      border-collapse: collapse;
+                      background-color: white;">
+          <thead>
+            <tr style="background-color: #ddd;">
+              <th style="padding: 8px; text-align: left;">Title</th>
+              <th style="padding: 8px; text-align: left;">Description</th>
+              <th style="padding: 8px; text-align: left;">Features</th>
+              <th style="padding: 8px; text-align: left;">$/Night</th>
+              <th style="padding: 8px; text-align: left;">Posted By</th>
+              <th style="padding: 8px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for unit in results %}
+            <tr style="border-top: 1px solid #ccc;">
+              <td style="padding: 8px;">{{ unit[1] }}</td>
+              <td style="padding: 8px;">{{ unit[2] }}</td>
+              <td style="padding: 8px;">{{ unit[5] }}</td>
+              <td style="padding: 8px;">${{ unit[3] }}</td>
+              <td style="padding: 8px;">{{ unit[4] }}</td>
+              <td style="padding: 8px;">
+                <button type="button"
+                        class="review-btn"
+                        data-id="{{ unit[0] }}"
+                        style="height: 30px; width: auto; padding: 0 10px;">
+                  Review
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% elif searched_feature %}
+        <p style="margin-top: 15px;">
+          No rental units found with feature "{{ searched_feature }}".
+        </p>
+        {% endif %}
+
+      </div>
+
+      <!-- Post Rental Modal -->
+      <div id="postRentalModal" class="sn_modal">
+        <div class="modal-content">
+          <form action="/post_rental" method="POST">
+
+            <label>Title (City, State):</label>
+            <input type="text" name="title"
+                   placeholder="e.g. Los Angeles, California" required><br><br>
+
+            <label>Description:</label><br>
+            <textarea name="description" rows="3"
+                      style="width: 100%;" required></textarea><br><br>
+
+            <label>Features (comma-separated):</label>
+            <input type="text" name="features"
+                   placeholder="e.g. Mountainview, Wi-Fi, Kitchen" required><br><br>
+
+            <label>Price per Night ($):</label>
+            <input type="number" name="price"
+                   step="0.01" min="0" required><br><br>
+
+            <button type="submit" style="height: 45px;">Post Rental</button>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Review Modal -->
+      <div id="reviewModal" class="sn_modal">
+        <div class="modal-content">
+          <form action="/post_review" method="POST">
+
+            <input type="hidden" name="rental_id" id="review_rental_id">
+            <input type="hidden" name="last_feature" value="{{ searched_feature or '' }}">
+
+            <label>Score:</label><br>
+            <select name="score" style="width: 100%; height: 35px; margin-bottom: 15px;">
+              <option value="Excellent">Excellent</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Poor">Poor</option>
+            </select><br><br>
+
+            <label>Remark:</label><br>
+            <textarea name="remark" rows="3"
+                      style="width: 100%;" required></textarea><br><br>
+
+            <button type="submit" style="height: 45px;">Submit Review</button>
+
+          </form>
+        </div>
+      </div>
+
     </main>
-     <script type="text/javascript">
-        var username = "{{ session['username'] }}";
-        document.getElementById("user").innerText = "Logged in as " + username;
+
+    <script type="text/javascript">
+      // Show username
+      var username = "{{ session['username'] }}";
+      document.getElementById("user").innerText = "Logged in as " + username;
+
+      // Post Rental modal
+      var postRentalModal = document.getElementById("postRentalModal");
+      var postRentalBtn   = document.getElementById("postRentalBtn");
+      postRentalBtn.onclick = function () {
+        postRentalModal.style.display = "block";
+      };
+
+      // Review modal — set rental_id from whichever row was clicked
+      var reviewModal = document.getElementById("reviewModal");
+      document.querySelectorAll(".review-btn").forEach(function (btn) {
+        btn.onclick = function () {
+          document.getElementById("review_rental_id").value = btn.getAttribute("data-id");
+          reviewModal.style.display = "block";
+        };
+      });
+
+      // Close any modal when clicking outside it
+      window.onclick = function (event) {
+        if (event.target === postRentalModal) postRentalModal.style.display = "none";
+        if (event.target === reviewModal)     reviewModal.style.display     = "none";
+      };
     </script>
   </body>
 </html>
