@@ -10,7 +10,7 @@ app.secret_key = "cool_key"
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="SQLTEN9000!",
+    password="Woodwindow8@",
     database="project_db"
 )
 

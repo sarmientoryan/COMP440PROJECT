@@ -51,3 +51,5 @@ step 3: change the password in app.py to match your MySQL password
 
 step 4: run
 python app.py
+
+phase 2 youtube link: https://www.youtube.com/watch?v=dda-1LYWCAc
