@@ -84,9 +84,79 @@
         </p>
         {% endif %}
 
-      </div>
+          <hr style="margin-top: 30px;">
 
-      <!-- Post Rental Modal -->
+          <h2>Phase 3 Queries</h2>
+
+          <!-- Most expensive rentals -->
+          <form action="/expensive" style="margin-top: 10px;">
+            <button type="submit">Most Expensive Rentals Per Feature</button>
+          </form>
+
+          <!-- Feature X & Y -->
+          <form action="/feature_pair" style="margin-top: 10px;">
+            <input name="feature1" placeholder="Feature X" required>
+            <input name="feature2" placeholder="Feature Y" required>
+            <button type="submit">Find Users</button>
+          </form>
+
+          <!-- Good rentals -->
+          <form action="/good_rentals" style="margin-top: 10px;">
+            <input name="username" placeholder="Enter Username" required>
+            <button type="submit">View Good Rentals</button>
+          </form>
+
+          <!-- Top users by date -->
+          <form action="/top_users" style="margin-top: 10px;">
+            <input type="date" name="date" required>
+            <button type="submit">Top Users</button>
+          </form>
+
+          <!-- Poor reviewers -->
+          <form action="/poor_reviewers" style="margin-top: 10px;">
+            <button type="submit">Users Who Only Give Poor Reviews</button>
+          </form>
+
+          <!-- No poor landlords -->
+          <form action="/no_poor_landlords" style="margin-top: 10px;">
+            <button type="submit">Users With No Poor Reviews</button>
+          </form>
+
+      
+
+              <!-- Phase 3 Results -->
+        {% if phase3_results %}
+        <table style="width:100%; margin-top:20px; background:white;">
+          <tr>
+            <th>Data</th>
+          </tr>
+          {% for r in phase3_results %}
+          <tr>
+            <td>{{ r[1] }}</td>  <!-- title -->
+            <td>${{ r[2] }}</td> <!-- price -->
+            <td>{{ r[3] }}</td>  <!-- feature -->
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if phase3_users %}
+        <table style="width:100%; margin-top:20px; background:white;">
+          <tr>
+            <th>Username</th>
+          </tr>
+          {% for u in phase3_users %}
+          <tr>
+            <td>{{ u[0] }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+
+        
+        </div>
+      
+<!-- Post Rental Modal -->
       <div id="postRentalModal" class="sn_modal">
         <div class="modal-content">
           <form action="/post_rental" method="POST">

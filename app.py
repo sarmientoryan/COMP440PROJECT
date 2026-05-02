@@ -10,7 +10,7 @@ app.secret_key = "cool_key"
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="Woodwindow8@",
+    password="Infaredgods1103",
     database="project_db"
 )
 
@@ -203,6 +203,166 @@ def post_review():
                            review_msg="Review submitted successfully!",
                            results=results,
                            searched_feature=last_feature)
+
+# ── Phase 3 ──────────────────────────────────────────────────────────────────
+
+@app.route('/expensive')
+def expensive():
+    # Ensure user is logged in
+    if 'username' not in session:
+        return redirect('/')
+
+    cursor = db.cursor()
+
+    # Find rentals that have the maximum price for each feature
+    cursor.execute("""
+        SELECT r.rental_id, r.title, r.price, f.feature
+        FROM rental_unit r
+        JOIN feature f ON r.rental_id = f.rental_id
+        JOIN (
+            SELECT f.feature, MAX(r.price) AS max_price
+            FROM rental_unit r
+            JOIN feature f ON r.rental_id = f.rental_id
+            GROUP BY f.feature
+        ) m
+        ON f.feature = m.feature AND r.price = m.max_price
+    """)
+
+    results = cursor.fetchall()
+    return render_template('loggedin.html', phase3_results=results)
+
+@app.route('/feature_pair')
+def feature_pair():
+    # Ensure user is logged in
+    if 'username' not in session:
+        return redirect('/')
+
+    # Get user input features
+    f1 = request.args.get('feature1')
+    f2 = request.args.get('feature2')
+
+    cursor = db.cursor()
+
+    # Find users who posted two different rentals on the same day
+    # where one has feature X and the other has feature Y
+    cursor.execute("""
+        SELECT DISTINCT r1.username
+        FROM rental_unit r1
+        JOIN rental_unit r2
+            ON r1.username = r2.username
+            AND r1.post_date = r2.post_date
+        JOIN feature f1t ON r1.rental_id = f1t.rental_id
+        JOIN feature f2t ON r2.rental_id = f2t.rental_id
+        WHERE f1t.feature = %s
+          AND f2t.feature = %s
+          AND r1.rental_id != r2.rental_id
+    """, (f1, f2))
+
+    users = cursor.fetchall()
+    return render_template('loggedin.html', phase3_users=users)
+
+@app.route('/good_rentals')
+def good_rentals():
+    # Ensure user is logged in
+    if 'username' not in session:
+        return redirect('/')
+
+    username = request.args.get('username')
+    cursor = db.cursor()
+
+    # Select rentals of the user where:
+    # - They have reviews
+    # - None of the reviews are "fair" or "poor"
+    cursor.execute("""
+        SELECT r.*
+        FROM rental_unit r
+        WHERE r.username = %s
+        AND r.rental_id IN (
+            SELECT rental_id
+            FROM review
+            GROUP BY rental_id
+            HAVING COUNT(*) > 0
+            AND SUM(CASE WHEN score IN ('fair','poor') THEN 1 ELSE 0 END) = 0
+        )
+    """, (username,))
+
+    results = cursor.fetchall()
+    return render_template('loggedin.html', phase3_results=results)
+
+@app.route('/top_users')
+def top_users():
+    # Ensure user is logged in
+    if 'username' not in session:
+        return redirect('/')
+
+    date_input = request.args.get('date')
+    cursor = db.cursor()
+
+    # Find users who posted the highest number of rentals on a given date
+    # Includes ties (multiple users with same max count)
+    cursor.execute("""
+        SELECT username
+        FROM rental_unit
+        WHERE post_date = %s
+        GROUP BY username
+        HAVING COUNT(*) = (
+            SELECT MAX(cnt)
+            FROM (
+                SELECT COUNT(*) AS cnt
+                FROM rental_unit
+                WHERE post_date = %s
+                GROUP BY username
+            ) t
+        )
+    """, (date_input, date_input))
+
+    users = cursor.fetchall()
+    return render_template('loggedin.html', phase3_users=users)
+
+@app.route('/poor_reviewers')
+def poor_reviewers():
+    # Ensure user is logged in
+    if 'username' not in session:
+        return redirect('/')
+
+    cursor = db.cursor()
+
+    # Find users who have written reviews
+    # and ALL of their reviews are "poor"
+    cursor.execute("""
+        SELECT username
+        FROM review
+        GROUP BY username
+        HAVING COUNT(*) > 0
+        AND SUM(CASE WHEN score != 'poor' THEN 1 ELSE 0 END) = 0
+    """)
+
+    users = cursor.fetchall()
+    return render_template('loggedin.html', phase3_users=users)
+
+@app.route('/no_poor_landlords')
+def no_poor_landlords():
+    # Ensure user is logged in
+    if 'username' not in session:
+        return redirect('/')
+
+    cursor = db.cursor()
+
+    # Find users who posted rentals
+    # and NONE of their rentals have received a "poor" review
+    cursor.execute("""
+        SELECT DISTINCT r.username
+        FROM rental_unit r
+        WHERE r.username NOT IN (
+            SELECT r2.username
+            FROM rental_unit r2
+            JOIN review rev ON r2.rental_id = rev.rental_id
+            WHERE rev.score = 'poor'
+        )
+    """)
+
+    users = cursor.fetchall()
+    return render_template('loggedin.html', phase3_users=users)
 
 # ─────────────────────────────────────────────────────────────────────────────
 
