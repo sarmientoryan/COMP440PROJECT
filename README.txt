@@ -53,3 +53,17 @@ step 4: run
 python app.py
 
 phase 2 youtube link: https://www.youtube.com/watch?v=dda-1LYWCAc
+
+
+PHASE 3 
+
+run pip install -r requirements.txt to download Faker
+then run python script.py to add in users
+then run python app.py 
+
+***if you want to delete all reviews and fake users***
+DELETE FROM review WHERE review_id >= 0;
+DELETE FROM feature WHERE rental_id >= 0;
+DELETE FROM rental_unit WHERE rental_id >= 0;
+DELETE FROM user
+WHERE username LIKE 'user%';
