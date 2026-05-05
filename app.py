@@ -364,12 +364,49 @@ def no_poor_landlords():
     users = cursor.fetchall()
     return render_template('loggedin.html', phase3_users=users)
 
-# ─────────────────────────────────────────────────────────────────────────────
 
 cursor = db.cursor()
 cursor.execute("SHOW TABLES")
 for table in cursor:
     print(table)
+
+@app.route('/user/<username>')
+def user_profile(username):
+    if 'username' not in session:
+        return redirect('/')
+
+    view = request.args.get("view", "received")  
+    cursor = db.cursor()
+
+    if view == "written":
+        cursor.execute("""
+            SELECT rental_id, score, remark, review_date
+            FROM review
+            WHERE username = %s
+        """, (username,))
+        reviews = cursor.fetchall()
+
+        return render_template(
+            "loggedin.html",
+            profile_user=username,
+            user_reviews=reviews,
+            profile_mode="written"
+        )
+
+    cursor.execute("""
+        SELECT r.rental_id, rev.score, rev.remark, rev.review_date
+        FROM review rev
+        JOIN rental_unit r ON rev.rental_id = r.rental_id
+        WHERE r.username = %s
+    """, (username,))
+    reviews = cursor.fetchall()
+
+    return render_template(
+        "loggedin.html",
+        profile_user=username,
+        user_reviews=reviews,
+        profile_mode="received"
+    )
 
 @app.route('/logout')
 def logout():

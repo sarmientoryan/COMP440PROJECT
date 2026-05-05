@@ -141,17 +141,46 @@
         {% endif %}
 
         {% if phase3_users %}
-        <table style="width:100%; margin-top:20px; background:white;">
-          <tr>
-            <th>Username</th>
-          </tr>
-          {% for u in phase3_users %}
-          <tr>
-            <td>{{ u[0] }}</td>
-          </tr>
-          {% endfor %}
-        </table>
+          <table style="width:100%; margin-top:20px; background:white;">
+            <tr>
+              <th>Username</th>
+            </tr>
+
+            {% for u in phase3_users %}
+            <tr>
+              <td>
+                {% if request.path == "/poor_reviewers" %}
+                  <a href="/user/{{ u[0] }}?view=written">
+                    {{ u[0] }}
+                  </a>
+                {% else %}
+                  <a href="/user/{{ u[0] }}?view=received">
+                    {{ u[0] }}
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
         {% endif %}
+
+          <h3>Reviews</h3>
+          <table style="width:100%; background:white;">
+            <tr>
+              <th>Rental ID</th>
+              <th>Score</th>
+              <th>Remark</th>
+              <th>Date</th>
+            </tr>
+            {% for rev in user_reviews %}
+            <tr>
+              <td>{{ rev[0] }}</td>
+              <td>{{ rev[1] }}</td>
+              <td>{{ rev[2] }}</td>
+              <td>{{ rev[3] }}</td>
+            </tr>
+            {% endfor %}
+          </table>
 
         
         </div>
